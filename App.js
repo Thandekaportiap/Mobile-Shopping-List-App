@@ -19,7 +19,7 @@ export default function App() {
           <Stack.Screen
             name="Login"
             component={LoginScreen}
-            options={{ title: 'Login' }}
+            options={{ title: 'Login', headerShown: false }}
           />
 
           {/* Register Screen */}
@@ -31,13 +31,13 @@ export default function App() {
           <Stack.Screen
             name="Home"
             component={HomeScreen}
-            options={{ title: 'Home' }}
+            options={{ title: 'Home', headerShown: false }}
           />
           {/* Shopping Lists Screen */}
           <Stack.Screen
             name="ShoppingLists"
             component={ShoppingListsScreen}
-            options={{ title: 'Shopping Lists' }}
+            options={{ title: 'Shopping Lists' , headerShown: false }}
           />
         </Stack.Navigator>
       </NavigationContainer>

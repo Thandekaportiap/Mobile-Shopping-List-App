@@ -10,10 +10,9 @@ const HomeScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Shopping List App</Text>
       <Image
-        source={require('../../assets/shopping-online-concept-grocery-red-basket-shopping-basket-different-foods-beverages-shopping-online-concept-grocery-240113026.webp')}
+        source={require('../../assets/1686 - Copy.jpg')}
         style={styles.logo}
       />
-      {/* <Button title="Get Started" onPress={navigateToShoppingList} color="#778a35" /> */}
       <TouchableOpacity style={styles.button} onPress={navigateToShoppingList}>  
         <Text style={styles.buttonText}>Get Started</Text>
       </TouchableOpacity>
@@ -24,23 +23,28 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-   
+   justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ebebe8', // Light gray background
+    backgroundColor: 'transparent',
     padding: 20,
   },
   title: {
     fontSize: 28,
+  
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 40,
     textAlign: 'center',
-    color: '#778a35', // Green color for title text
+    color: '#778a35',
+    paddingVertical: 10,  // Adds vertical padding inside the border
+    borderTopWidth: 3,    // Adds border at the top
+    borderBottomWidth: 3, // Adds border at the bottom
+    borderColor: '#778a35', // Green color for the borders
   },
   logo: {
     width: 250,
     height: 250,
     marginBottom: 30,
-    borderRadius: 15, // Optional: Add rounded corners for a smoother look
+    backgroundColor: "transparent",
   },
   button: {
     marginTop: 20,
