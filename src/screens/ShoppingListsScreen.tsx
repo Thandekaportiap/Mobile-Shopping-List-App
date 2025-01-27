@@ -1,13 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import CheckBox from '@react-native-community/checkbox';
 import { useDispatch, useSelector } from 'react-redux';
-import { addList, deleteList, addItemToList, removeItemFromList } from '../features/listsSlice';
+import {
+  addList,
+  deleteList,
+  addItemToList,
+  removeItemFromList,
+  editItemInList,
+  togglePurchasedStatus,
+} from '../features/listsSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootState } from '../../store';
+import Icon from 'react-native-vector-icons/Feather';
 
 const ShoppingListsScreen = () => {
   const [listName, setListName] = useState('');
   const [itemName, setItemName] = useState('');
+  const [quantity, setQuantity] = useState('');
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
 
   const dispatch = useDispatch();
@@ -60,22 +70,19 @@ const ShoppingListsScreen = () => {
   };
 
   const handleAddItem = () => {
-    if (itemName.trim() && selectedListId) {
-      const item = {
+    if (itemName.trim() && quantity.trim() && selectedListId) {
+      const newItem = {
         id: Date.now().toString(),
         name: itemName,
+        quantity,
         purchased: false,
       };
-      dispatch(addItemToList({ listId: selectedListId, item }));
+      dispatch(addItemToList({ listId: selectedListId, item: newItem }));
       setItemName('');
+      setQuantity('');
     } else {
-      Alert.alert('Error', 'Please select a list and enter an item name.');
+      Alert.alert('Error', 'Please enter item name and quantity.');
     }
-  };
-
-  const handleSelectList = (id: string) => {
-    setSelectedListId(id);
-    setItemName(''); // Reset item name when selecting a new list
   };
 
   const handleRemoveItem = (itemId: string) => {
@@ -84,75 +91,77 @@ const ShoppingListsScreen = () => {
     }
   };
 
+  const handleTogglePurchased = (itemId: string) => {
+    if (selectedListId) {
+      dispatch(togglePurchasedStatus({ listId: selectedListId, itemId }));
+    }
+  };
+
+  const handleSelectList = (id: string) => {
+    setSelectedListId(id);
+    setItemName('');
+  };
+
   const selectedList = shoppingLists.find((list) => list.id === selectedListId);
 
   return (
-    <View style={{ padding: 20, flex: 1 }}>
-      <Text style={{ fontSize: 30, marginBottom: 10, marginTop: 20, fontWeight: 'bold', color: '#778a35' }}>Shopping Lists</Text>
+    <View style={styles.container}>
+      <Text style={styles.header}>Shopping Lists</Text>
       <TextInput
         placeholder="Enter list name"
         value={listName}
         onChangeText={setListName}
-        style={{
-          borderWidth: 3,
-          borderColor: '#778a35',
-          padding: 10,
-          marginVertical: 10,
-          borderRadius: 5,
-        }}
+        style={styles.input}
       />
-     
       <TouchableOpacity style={styles.button} onPress={handleAddList}>
         <Text style={styles.buttonText}>Add List</Text>
       </TouchableOpacity>
 
       {selectedListId && selectedList ? (
-        <View style={{ marginVertical: 20 }}>
+        <View style={styles.listDetails}>
           <Text>
-  Selected List: <Text style={styles.boldText}>{selectedList.name}</Text>
-</Text>
+            Selected List: <Text style={styles.boldText}>{selectedList.name}</Text>
+          </Text>
           <TextInput
             placeholder="Enter item name"
             value={itemName}
             onChangeText={setItemName}
-            style={{
-              borderWidth: 3,
-              borderColor: '#778a35',
-              padding: 10,
-              marginVertical: 10,
-              borderRadius: 5,
-            }}
+            style={styles.input}
           />
-       
+          <TextInput
+            placeholder="Enter quantity"
+            value={quantity}
+            onChangeText={setQuantity}
+            style={styles.input}
+          />
           <TouchableOpacity style={styles.button} onPress={handleAddItem}>
             <Text style={styles.buttonText}>Add Item</Text>
           </TouchableOpacity>
 
-          {/* Displaying items of the selected list */}
-          <Text style={{ marginVertical: 25, fontSize: 20, color: '#d1e2c4' }}>Items in the {selectedList.name} list: {selectedList.items.length}</Text>
+          <Text style={styles.itemCount}>
+            Items in {selectedList.name}: {selectedList.items.length}
+          </Text>
           <FlatList
             data={selectedList.items}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  padding: 10,
-                  borderBottomWidth: 1,
-                  borderBottomColor: '#ccc',
-                }}
-              >
-                <Text>{item.name}</Text>
+              <View style={styles.itemRow}>
+                <Text style={styles.itemText}>
+                  {item.name} (Qty: {item.quantity})
+                </Text>
+                {/* <CheckBox
+                  value={item.purchased}
+                  onValueChange={() => handleTogglePurchased(item.id)}
+                /> */}
                 <TouchableOpacity onPress={() => handleRemoveItem(item.id)}>
-                  <Text style={{ color: 'red' }}>Remove</Text>
+                  <Text style={styles.removeText}>Remove</Text>
                 </TouchableOpacity>
               </View>
             )}
           />
         </View>
       ) : (
-        <Text style={{ marginVertical: 25, fontSize: 20, color: 'red' }}>Select a list to see its items!</Text>
+        <Text style={styles.noSelectionText}>Select a list to see its items!</Text>
       )}
 
       <FlatList
@@ -160,20 +169,18 @@ const ShoppingListsScreen = () => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              padding: 10,
-              borderBottomWidth: 1,
-              borderBottomColor: '#ccc',
-            }}
+            style={[
+              styles.listRow,
+              selectedListId === item.id && styles.selectedList,
+            ]}
           >
             <TouchableOpacity onPress={() => handleSelectList(item.id)}>
-              <Text>{item.name}</Text>
+              <Text style={styles.listName}>{item.name}</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleDeleteList(item.id)}>
-              <Text style={{ color: 'red' }}>Delete</Text>
-            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleDeleteList(item.id)} style={styles.iconContainer}>
+  <Icon name="trash" size={24} color="#ff0000" />
+</TouchableOpacity>
+
           </View>
         )}
       />
@@ -182,12 +189,30 @@ const ShoppingListsScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  button: {
+  container: {
+    padding: 20,
+    flex: 1,
+  },
+  header: {
+    fontSize: 30,
+    marginBottom: 10,
     marginTop: 20,
+    fontWeight: 'bold',
+    color: '#778a35',
+  },
+  input: {
+    borderWidth: 2,
+    borderColor: '#778a35',
+    padding: 10,
+    marginVertical: 10,
+    borderRadius: 5,
+  },
+  button: {
+    marginTop: 10,
     backgroundColor: '#778a35',
     borderRadius: 18,
     paddingVertical: 12,
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
     alignItems: 'center',
   },
   buttonText: {
@@ -195,9 +220,58 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
+  listDetails: {
+    marginVertical: 20,
+  },
   boldText: {
     fontWeight: 'bold',
-    color: 'green', 
+    color: 'green',
+  },
+  itemCount: {
+    marginVertical: 15,
+    fontSize: 16,
+    color: '#d1e2c4',
+  },
+  itemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  itemText: {
+    flex: 1,
+  },
+  removeText: {
+    color: 'red',
+    marginLeft: 10,
+  },
+  noSelectionText: {
+    marginVertical: 20,
+    fontSize: 16,
+    color: 'red',
+  },
+  listRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  selectedList: {
+    backgroundColor: '#f0f7e4',
+  },
+  listName: {
+    fontSize: 16,
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
+  },
+  iconContainer: {
+    padding: 5,
   },
 });
 

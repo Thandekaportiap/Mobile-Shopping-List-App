@@ -25,7 +25,7 @@ const LoginScreen = ({ navigation }) => {
     <View style={styles.top}>
         <View style={styles.box}>
           <Svg 
-            height={300}
+            height={400}
             width={Dimensions.get('screen').width}
             viewBox="0 0 1440 320"
             style={styles.topWavy}
@@ -78,21 +78,16 @@ const styles = StyleSheet.create({
   
   box: {
     backgroundColor: '#778a35',
-    height: 110,
+    height: 160,
   },
-  svgHeader: {
-    height: 150,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#778a35',
-  },
+  
   headerText: {
     fontSize: 28,
     color: '#EBEBE8',
     fontWeight: 'bold',
     position: 'absolute',
-    top: 20,
-    left: 20,
+    top: 45,
+    left: 25,
   },
   form: {
     flex: 1,
@@ -100,13 +95,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     marginBottom: 20,
     fontWeight: '400',
     color: '#EBEBE8',
     position: 'absolute',
-    top: 70,
-    left: 20,
+    top: 85,
+    left: 25,
   },
   input: {
     borderWidth: 1,
