@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, Dimensions, StatusBar, Touch
 import { useDispatch } from 'react-redux';
 import Svg, { Path } from 'react-native-svg'; // Import Svg and Path
 import { login } from '../features/authSlice'; // Your Redux action for login
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 
 const LoginScreen = ({ navigation }) => {
@@ -36,6 +37,9 @@ const LoginScreen = ({ navigation }) => {
             />
           </Svg>
         </View>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="chevron-back" size={24} color="#ffffff" />
+          </TouchableOpacity>
         <Text style={styles.headerText}>Welcome Back</Text>
         <Text style={styles.title}>Login to your account</Text>
       </View>
@@ -87,7 +91,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     position: 'absolute',
     top: 45,
-    left: 25,
+    left: 45
   },
   form: {
     flex: 1,
@@ -103,6 +107,7 @@ const styles = StyleSheet.create({
     top: 85,
     left: 25,
   },
+
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -127,6 +132,15 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: '600',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 45,
+    left: 10,
+    zIndex: 10,
+    // backgroundColor: 'rgba(0, 0, 0, 0.5)', // Optional for better visibility
+    borderRadius: 20,
+    padding: 8,
   },
 });
 
