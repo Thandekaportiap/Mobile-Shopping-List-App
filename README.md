@@ -2,7 +2,7 @@
 
 <h1>Mobile-Shopping-List-App</h1> 
 
-# Shopping List App
+
 
 ## Setup
 1. Clone the repository.
