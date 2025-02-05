@@ -138,7 +138,6 @@ const styles = StyleSheet.create({
     top: 45,
     left: 10,
     zIndex: 10,
-    // backgroundColor: 'rgba(0, 0, 0, 0.5)', // Optional for better visibility
     borderRadius: 20,
     padding: 8,
   },

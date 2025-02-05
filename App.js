@@ -7,6 +7,7 @@ import RegisterScreen from './src/screens/RegisterScreen'; // Register screen
 import LoginScreen from './src/screens/LoginScreen'; // Login screen
 import ShoppingListsScreen from './src/screens/ShoppingListsScreen'; // Shopping List screen
 import HomeScreen from './src/screens/HomeScreen'; // Home screen
+import ShoppingListDetailScreen from './src/screens/ShoppingListDetailScreen'; // Shopping List Detail screen
 
 const Stack = createStackNavigator();
 
@@ -38,6 +39,12 @@ export default function App() {
             name="ShoppingLists"
             component={ShoppingListsScreen}
             options={{ title: 'Shopping Lists' , headerShown: false }}
+          />
+          {/* Shopping List Detail Screen */}
+          <Stack.Screen
+            name="ShoppingListDetail"
+            component={ShoppingListDetailScreen}
+            options={{ title: 'Shopping List Detail' , headerShown: false }}
           />
         </Stack.Navigator>
       </NavigationContainer>
