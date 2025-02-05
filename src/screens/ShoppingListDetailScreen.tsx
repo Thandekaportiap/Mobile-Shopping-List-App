@@ -1,11 +1,11 @@
-// ShoppingListDetailScreen.js
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, FlatList, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, TouchableOpacity, Alert, StyleSheet, Modal } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { addItemToList, removeItemFromList, togglePurchasedStatus } from '../features/listsSlice';
+import { addItemToList, removeItemFromList, togglePurchasedStatus, editItemInList } from '../features/listsSlice';
 import { RootState } from '../../store';
 import Icon from 'react-native-vector-icons/Feather';
 import { useRoute } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 const ShoppingListDetailScreen = () => {
   const [itemName, setItemName] = useState('');
@@ -15,6 +15,19 @@ const ShoppingListDetailScreen = () => {
   const { listId } = route.params;
   const shoppingLists = useSelector((state: RootState) => state.lists.lists);
   const selectedList = shoppingLists.find((list) => list.id === listId);
+  const [editingItem, setEditingItem] = useState(null);
+
+  const handleEditItem = (item) => {
+    setEditingItem(item);
+  };
+  
+  const handleSaveEdit = () => {
+    if (editingItem && selectedList) {
+      dispatch(editItemInList({ listId: selectedList.id, itemId: editingItem.id, updatedItem: editingItem }));
+      setEditingItem(null);
+      Toast.show({ type: 'success', text1: 'Item updated successfully' });
+    }
+  };
 
   const handleAddItem = () => {
     if (itemName.trim() && quantity.trim() && selectedList) {
@@ -27,6 +40,7 @@ const ShoppingListDetailScreen = () => {
       dispatch(addItemToList({ listId: selectedList.id, item: newItem }));
       setItemName('');
       setQuantity('');
+      Toast.show({ type: 'success', text1: 'Item added successfully' });
     } else {
       Alert.alert('Error', 'Please enter item name and quantity.');
     }
@@ -35,6 +49,7 @@ const ShoppingListDetailScreen = () => {
   const handleRemoveItem = (itemId: string) => {
     if (selectedList) {
       dispatch(removeItemFromList({ listId: selectedList.id, itemId }));
+      Toast.show({ type: 'success', text1: 'Item deleted successfully' });
     }
   };
 
@@ -85,12 +100,35 @@ const ShoppingListDetailScreen = () => {
             <TouchableOpacity onPress={() => handleTogglePurchased(item.id)}>
               <Icon name={item.purchased ? 'check-square' : 'square'} size={24} color="#000" />
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleEditItem(item)}>
+              <Text style={styles.editText}>Edit</Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => handleRemoveItem(item.id)}>
               <Text style={styles.removeText}>Remove</Text>
             </TouchableOpacity>
           </View>
         )}
       />
+
+      {editingItem && (
+        <Modal visible={true} onRequestClose={() => setEditingItem(null)}>
+          <View style={styles.modalContainer}>
+            <TextInput
+              value={editingItem.name}
+              onChangeText={(text) => setEditingItem({ ...editingItem, name: text })}
+              style={styles.input}
+            />
+            <TextInput
+              value={editingItem.quantity}
+              onChangeText={(text) => setEditingItem({ ...editingItem, quantity: text })}
+              style={styles.input}
+            />
+            <TouchableOpacity onPress={handleSaveEdit} style={styles.button}>
+              <Text style={styles.buttonText}>Save</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      )}
     </View>
   );
 };
@@ -123,7 +161,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    color: '#fff',
+    color: 'black',
     fontSize: 18,
     fontWeight: '600',
   },
@@ -140,9 +178,18 @@ const styles = StyleSheet.create({
   itemText: {
     flex: 1,
   },
+  editText: {
+    color: 'blue',
+    marginLeft: 10,
+  },
   removeText: {
     color: 'red',
     marginLeft: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
   },
 });
 
